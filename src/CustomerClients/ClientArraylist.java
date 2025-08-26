@@ -7,6 +7,7 @@ package CustomerClients;
 import CustomerClients.Clients;
 import Lists.List;
 import employee.Employee;
+import exceptions.Clients.ActiveReservationException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -37,21 +38,25 @@ import java.util.HashSet;
         
     }
 
-    public boolean removeById(String id) {
-        //Agregar la excepción de no se puede eliminar si tiene una reserva activa. 
-        Clients e = find(id);
-        if (e != null) {
-            list.remove(e);
-            return true;
+   public boolean removeById(String id) throws ActiveReservationException {
+    Clients e = find(id);
+
+    if (e != null) {
+        if (e.hasActiveReservation()) {
+            throw new ActiveReservationException(
+                "No se puede eliminar el cliente con ID " + id + " porque tiene reservas activas."
+            );
         }
-        return false;
-    }
 
-
-    @Override
-     public boolean remove(Clients e) {
-        return removeById(e.getId());
+        list.remove(e);
+        return true;
     }
+    return false;
+}
+
+   
+
+    
     @Override
     public Clients find(Object id) {
         String strId = String.valueOf(id);
@@ -78,6 +83,11 @@ import java.util.HashSet;
 
     public ArrayList<Clients> getAllEmployees() {
         return list;
+    }
+
+    @Override
+    public boolean remove(Clients l) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 } 
 
