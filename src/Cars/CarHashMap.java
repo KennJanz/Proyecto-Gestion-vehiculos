@@ -6,8 +6,8 @@ package Cars;
  */
 
 import employee.Employee;
-import exceptions.CarRentedException;
-import exceptions.DuplicateLicensePlateException;
+import exceptions.Cars.CarRentedException;
+import exceptions.Cars.DuplicateLicensePlateException;
 import java.util.HashMap;
 import java.util.HashSet;
 
