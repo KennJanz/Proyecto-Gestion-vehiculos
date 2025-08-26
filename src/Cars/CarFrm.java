@@ -6,8 +6,8 @@ package Cars;
 
 import Interfaces.FrmInterface;
 import Utils.UtilGui;
-import exceptions.CarRentedException;
-import exceptions.DuplicateLicensePlateException;
+import exceptions.Cars.CarRentedException;
+import exceptions.Cars.DuplicateLicensePlateException;
 import java.time.Year;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
