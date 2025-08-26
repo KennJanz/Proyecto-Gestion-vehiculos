@@ -40,4 +40,30 @@ public class Clients extends Person {
         this.license = license;
         this.reservations = new ArrayList<>(); // INICIALIZAR
     }
+<<<<<<< Updated upstream
 }
+=======
+    
+    
+   public void setLicense(String license) throws NoLicensesException {
+        validateLicense(license);
+        this.license = license;
+    }
+   
+    private void validateLicense(String license) throws NoLicensesException {
+        if (license == null || license.isBlank()) {
+            throw new NoLicensesException();
+        }
+    }
+
+
+   public Clients(String license, String id, String name, LocalDate birthDate, String phone) throws NoLicensesException {
+    super(id, name, birthDate, phone);
+    this.typeLicenses = Licenses.NONE;
+    setLicense(license); 
+}
+
+
+}  
+
+>>>>>>> Stashed changes

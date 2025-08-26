@@ -76,7 +76,7 @@ import java.util.HashSet;
    public HashSet<Licenses> getPositions() {
     HashSet<Licenses> positions = new HashSet<>();
     for (Clients emp : list) {
-        positions.add(emp.getTypeLicenses()); // ahora devuelve enum
+        positions.add(emp.getTypeLicenses());
     }
     return positions;
 }
