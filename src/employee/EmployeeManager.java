@@ -5,7 +5,9 @@
 package employee;
 
 import Lists.List;
+import employee.Employee;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class EmployeeManager implements List<Employee> {
@@ -16,58 +18,49 @@ public class EmployeeManager implements List<Employee> {
         this.list = new ArrayList<>();
     }
 
+    // Devuelve la lista completa
+    public ArrayList<Employee> getList() {
+        return list;
+    }
+
     @Override
     public boolean add(Employee e) {
-        if (find(e.getId()) != null) {
-            return false;
-        }
-        // Validar edad mínima
-        if (e.getAge() < 18) {
+        if (find(e.getId()) != null) { // no duplicados por ID
             return false;
         }
         list.add(e);
         return true;
     }
 
-    public boolean removeById(String id) {
-        Employee e = find(id);
-        if (e != null) {
-            list.remove(e);
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public boolean remove(Employee e) {
-        return removeById(e.getId());
+        return list.remove(e); // elimina si existe
     }
 
     @Override
     public Employee find(Object id) {
         String strId = String.valueOf(id);
-        for (Employee emp : list) {
-            if (emp.getId().equals(strId)) {
-                return emp;
-            }
+        for (Employee e : list) {
+            if (e.getId().equals(strId)) {
+                return e;
+            } 
         }
         return null;
     }
 
     @Override
     public void showAll() {
-
-    }
-
-    public HashSet<String> getPositions() {
-        HashSet<String> positions = new HashSet<>();
-        for (Employee emp : list) {
-            positions.add(emp.getPosition());
+        for (Employee e : list) {
+            System.out.println(e);
         }
-        return positions;
     }
 
-    public ArrayList<Employee> getAllEmployees() {
-        return list;
+    // Devuelve un conjunto de posiciones únicas
+    public HashSet<String> getPositions() {
+        HashSet<String> set = new HashSet<>();
+        for (Employee e : list) {
+            set.add(e.getPosition());
+        }
+        return set;
     }
-} 
+}

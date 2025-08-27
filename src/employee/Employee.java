@@ -22,7 +22,7 @@ public class Employee extends Person {
 
     public void setPosition(String position) {
         this.position = position;
-    }
+    } 
 
     public void setSalary(double salary) {
         this.salary = salary;
@@ -32,11 +32,11 @@ public class Employee extends Person {
         super(id, name, birthDate, phone);
         setEmail(email);
         this.position = position;
-        this.salary = salary;
+        this.salary = salary; 
     }
 
     @Override
     public String toString() {
         return "Employee{ID='" + getId() + "', Name='" + getName() + "', Birth Date=" + getBirthDate() + ", Age=" + getAge() + ", Phone='" + getPhone() + "', Email='" + getEmail() + "', Position='" + position + "', Salary=" + salary + "}";
     }
-}  
+}
