@@ -9,9 +9,10 @@ package CustomerClients;
  * @author Yumor
  */
 public enum Licenses {
+    NONE(false),
     B1(true),
-    B2(true), 
-    NONE(false); 
+    B2(true);
+    
     
     private final boolean Licenses; 
 
@@ -19,7 +20,7 @@ public enum Licenses {
         this.Licenses = Licenses;
     }
 
-    public boolean isLicenses() {
+    public boolean isActiveLicenses() {
         return Licenses;
     }
         
