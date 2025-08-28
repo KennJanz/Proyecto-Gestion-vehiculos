@@ -23,6 +23,11 @@ import java.util.HashSet;
         this.list = new ArrayList<>();
     }
 
+    public ArrayList<Clients> getList() {
+        return list;
+    }
+    
+
     @Override
     public boolean add(Clients e) {
         if (find(e.getId()) != null) {
@@ -89,6 +94,9 @@ import java.util.HashSet;
     public boolean remove(Clients l) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+    
+    
+
 } 
 
 
