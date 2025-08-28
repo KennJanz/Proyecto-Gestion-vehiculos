@@ -1,5 +1,4 @@
 package CustomerClients;
-
 import Bookings.Booking;
 import exceptions.Person.PersonException;
 import java.time.LocalDate;
@@ -64,4 +63,13 @@ public class Clients extends Person {
         setLicense(license);
         this.reservations = new ArrayList<>();
     }
+
+    public Clients(Licenses typeLicenses, String license, String id, String name, LocalDate birthDate, String phone, String email) throws PersonException,NoLicensesException {
+        super(id, name, birthDate, phone, email);
+        this.typeLicenses = typeLicenses;
+        this.license = license;
+        this.reservations = new ArrayList<>();
+    }
+    
+    
 }
