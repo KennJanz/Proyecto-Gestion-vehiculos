@@ -256,10 +256,8 @@
                                   <Component id="JidBooking" alignment="1" pref="93" max="32767" attributes="0"/>
                                   <Component id="jClients" alignment="1" max="32767" attributes="0"/>
                               </Group>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jEndDate" min="-2" pref="64" max="-2" attributes="0"/>
-                                  <Component id="jStartDate" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="jEndDate" min="-2" pref="64" max="-2" attributes="0"/>
+                              <Component id="jStartDate" min="-2" max="-2" attributes="0"/>
                               <Component id="jBookingState" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>

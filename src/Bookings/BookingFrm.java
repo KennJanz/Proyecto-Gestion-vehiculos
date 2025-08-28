@@ -1,14 +1,16 @@
+package Bookings;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package Bookings;
+
 
 import Cars.*;
 import CustomerClients.ClientArraylist;
 import CustomerClients.Clients;
 import Interfaces.FrmInterface;
-import Utils.UtilDateGeneralBirthDate;
+import Utils.UtilDate;
 import Utils.UtilGui;
 import exceptions.Bookings.CarNotAvailableException;
 import exceptions.Cars.CarRentedException;
@@ -260,9 +262,8 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
                     .addGroup(jPanelBodyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(JidBooking, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
                         .addComponent(jClients, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanelBodyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jStartDate))
+                    .addComponent(jEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jStartDate)
                     .addComponent(jBookingState))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanelBodyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -491,8 +492,8 @@ if (car == null) {
     return;
 }
 
-LocalDate startDate = UtilDateGeneralBirthDate.toLocalDate(txtStartDate.getText());
-LocalDate endDate = UtilDateGeneralBirthDate.toLocalDate(txtEndDate.getText());
+LocalDate startDate = UtilDate.toLocalDate(txtStartDate.getText());
+LocalDate endDate = UtilDate.toLocalDate(txtEndDate.getText());
 BookingState bookingState = (BookingState) txtBookingState.getSelectedItem();
 
 // Crear la reserva
@@ -541,7 +542,7 @@ showBookingStates();
             return;
         }
 
-        // Actualizar vehículo en la reserva
+       
         booking.setCar(newCar);
 
         UtilGui.showMessage(this, "Booking updated successfully", "Update");
