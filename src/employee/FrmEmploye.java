@@ -6,6 +6,8 @@ package employee;
 
 import Utils.UtilDate;
 import Utils.UtilGui;
+import exceptions.Person.PersonException;
+import java.awt.HeadlessException;
 import javax.swing.JOptionPane;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -92,7 +94,7 @@ public class FrmEmploye extends javax.swing.JInternalFrame {
                 return;
             }
 
-            Employee e = new Employee(id, name, birthDate, phone, email, position, salary);
+            Employee e = new Employee(position, salary, id, name, birthDate, phone,email);
 
             if (list.add(e)) {
                 JOptionPane.showMessageDialog(this, "Empleado agregado correctamente");
@@ -101,12 +103,12 @@ public class FrmEmploye extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(this, "Ya existe un empleado con ese ID");
             }
 
-        } catch (Exception ex) {
+        } catch (PersonException | HeadlessException ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
 
-    private void update() {
+    private void update() throws PersonException {
         if (employee == null) {
             UtilGui.showErrorMessage(this, "No se ha seleccionado un registro", "Error");
             return;
@@ -529,7 +531,11 @@ public class FrmEmploye extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-        update();
+        try {
+            update();
+        } catch (PersonException ex) {
+            System.getLogger(FrmEmploye.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
     }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed

@@ -4,6 +4,7 @@
  */
 package employee;
 
+import exceptions.Person.PersonException;
 import java.time.LocalDate;
 import persons.Person;
 
@@ -22,17 +23,16 @@ public class Employee extends Person {
 
     public void setPosition(String position) {
         this.position = position;
-    } 
+    }
 
     public void setSalary(double salary) {
         this.salary = salary;
     }
 
-    public Employee(String id, String name, LocalDate birthDate, String phone, String email, String position, double salary) {
-        super(id, name, birthDate, phone);
-        setEmail(email);
+    public Employee(String position, double salary, String id, String name, LocalDate birthDate, String phone, String email) throws PersonException {
+        super(id, name, birthDate, phone, email);
         this.position = position;
-        this.salary = salary; 
+        this.salary = salary;
     }
 
     @Override
