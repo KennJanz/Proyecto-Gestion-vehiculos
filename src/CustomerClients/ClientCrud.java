@@ -14,7 +14,7 @@ import javax.swing.table.TableRowSorter;
  *
  * @author unknown
  */
-public class ClientsCrud extends javax.swing.JDialog {
+public class ClientCrud extends javax.swing.JDialog {
     
     private ClientArraylist list;
     private Clients clients;
@@ -24,12 +24,12 @@ public class ClientsCrud extends javax.swing.JDialog {
     private TableRowSorter<DefaultTableModel> sorter;
     private RowFilter<DefaultTableModel, Object> rowFilter;
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ClientsCrud.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ClientCrud.class.getName());
 
     /**
      * Creates new form AnimalCrud
      */
-    public ClientsCrud(java.awt.Frame parent, boolean modal) {
+    public ClientCrud(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         
@@ -52,12 +52,27 @@ public class ClientsCrud extends javax.swing.JDialog {
     
     private void loadTable(){
         //reparar 
-    ClientArraylist<String, Car> map = list.getList();
-        model.setRowCount(0);
-        for (Clients clients : map.values()) {
-            Object[] data = {Clients., car.getBrand(),car.getModel(), String.valueOf(car.getYear().getValue()),car.getCarType(),car.getCarState()};
-            model.addRow(data);
-        }   
+  
+    // Obtener la lista de clientes
+    ArrayList<Clients> clientsList = list.getList(); 
+    
+    // Limpiar tabla antes de cargar
+    model.setRowCount(0);
+
+    // Recorrer lista y añadir cada cliente como fila
+    for (Clients client : clientsList) {
+        Object[] data = {
+            client.getId(),                                 
+            client.getName(),                               
+            client.getTypeLicenses(),                            
+            UtilDate.toString(client.getBirthDate()),        
+            client.getPhone(),                               
+            client.getEmail(),                               
+            client.getLicense()
+        };
+        model.addRow(data);
+    }
+
     }
     
     
@@ -100,7 +115,7 @@ public class ClientsCrud extends javax.swing.JDialog {
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "DNI", "Name ", "Last Name ", "Date ", "Phone ", "Email", "Licenses "
+                "DNI", "Name ", "Type Licenses ", "Date ", "Phone ", "Email", "Licenses "
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -216,7 +231,7 @@ public class ClientsCrud extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                ClientsCrud dialog = new ClientsCrud(new javax.swing.JFrame(), true);
+                ClientCrud dialog = new ClientCrud(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
