@@ -32,6 +32,8 @@ public class Booking {
     public Car getCar() {
         return car;
     }
+    
+    
 
     public LocalDate getEndDate() {
         return endDate;
@@ -48,6 +50,16 @@ public class Booking {
     public void setBookingState(BookingState bookingState) {
         this.bookingState = bookingState;
     }
+
+    public void setClient(Clients client) {
+        this.client = client;
+    }
+
+    public void setCar(Car car) {
+        this.car = car;
+    }
+    
+    
     
    public boolean isActive() {
     LocalDate today = LocalDate.now();
