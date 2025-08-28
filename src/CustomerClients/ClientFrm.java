@@ -4,22 +4,60 @@
  */
 package CustomerClients;
 
-import Rent.*;
-import Cars.*;
+
+import Interfaces.FrmInterface;
+import Utils.UtilDate;
+import Utils.UtilGui;
+import exceptions.Clients.ActiveReservationException;
+import exceptions.Person.PersonException;
+import java.time.LocalDate;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author unknown
  */
-public class ClientFrm extends javax.swing.JFrame {
+public class ClientFrm extends javax.swing.JFrame implements FrmInterface{
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ClientFrm.class.getName());
 
+    private Licenses licenses;
+    private Clients client;
+    private ClientArraylist list;
+    
     /**
      * Creates new form CarFrm
      */
     public ClientFrm() {
         initComponents();
+
+         list = new ClientArraylist();
+        client = null;
+        
+        txtLicenses.setVisible(false);
+        showClientLicense();
+        comboLicense.addActionListener(e -> {
+        String selectedStr = (String) comboLicense.getSelectedItem();
+        if (selectedStr == null) return;
+        Licenses selected = Licenses.valueOf(selectedStr);
+
+        if (selected == Licenses.B1 || selected == Licenses.B2) {
+            txtLicenses.setVisible(true);
+        } else {
+            txtLicenses.setVisible(false);
+        }
+    });
+    }
+    
+      private void showClientLicense() {
+          
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+    for (Licenses l : Licenses.values()) {
+        model.addElement(l.name()); // agrega el nombre del enum como String
+    }
+    comboLicense.setModel(model);
+          
     }
 
     /**
@@ -43,19 +81,18 @@ public class ClientFrm extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        txtNombre = new javax.swing.JTextField();
-        txtCedula = new javax.swing.JFormattedTextField();
-        txtApellido = new javax.swing.JTextField();
-        txtFechaNacimiento = new javax.swing.JFormattedTextField();
+        txtName = new javax.swing.JTextField();
+        txtDni = new javax.swing.JFormattedTextField();
+        txtDate = new javax.swing.JFormattedTextField();
         txtTelefono = new javax.swing.JFormattedTextField();
         txtCorreo = new javax.swing.JTextField();
-        txtLicenses = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
+        comboLicense = new javax.swing.JComboBox<>();
+        txtLicenses = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -69,7 +106,7 @@ public class ClientFrm extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Car Management");
+        jLabel1.setText("Client Management");
 
         javax.swing.GroupLayout jPanelTitleLayout = new javax.swing.GroupLayout(jPanelTitle);
         jPanelTitle.setLayout(jPanelTitleLayout);
@@ -91,8 +128,18 @@ public class ClientFrm extends javax.swing.JFrame {
         jPanelBtns.setBackground(new java.awt.Color(51, 51, 51));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/manageGUI/application_vnd.oasis.opendocument.spreadsheet (4).png"))); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/manageGUI/3floppy_unmount (4).png"))); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/manageGUI/updateIcon.png"))); // NOI18N
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -109,6 +156,11 @@ public class ClientFrm extends javax.swing.JFrame {
         });
 
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/manageGUI/deskbar-applet.png"))); // NOI18N
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelBtnsLayout = new javax.swing.GroupLayout(jPanelBtns);
         jPanelBtns.setLayout(jPanelBtnsLayout);
@@ -145,10 +197,6 @@ public class ClientFrm extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Name");
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("Last Name");
-
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Date");
@@ -165,15 +213,40 @@ public class ClientFrm extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Email");
 
-        txtFechaNacimiento.addActionListener(new java.awt.event.ActionListener() {
+        try {
+            txtDni.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("#0###0###")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+
+        txtDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/yyyy"))));
+        txtDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtFechaNacimientoActionPerformed(evt);
+                txtDateActionPerformed(evt);
+            }
+        });
+
+        try {
+            txtTelefono.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("########")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        txtTelefono.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtTelefonoActionPerformed(evt);
             }
         });
 
         jLabel13.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel13.setForeground(new java.awt.Color(255, 255, 255));
         jLabel13.setText("Licenses ");
+
+        comboLicense.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboLicense.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboLicenseActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -184,30 +257,30 @@ public class ClientFrm extends javax.swing.JFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(57, 57, 57)
-                        .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtLicenses, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(txtLicenses, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(comboLicense, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)
                         .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGap(54, 54, 54)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(txtCedula, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtDni, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(txtFechaNacimiento)
-                            .addComponent(txtApellido)
-                            .addComponent(txtNombre, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDate)
+                            .addComponent(txtName, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtTelefono, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
@@ -216,33 +289,29 @@ public class ClientFrm extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtCedula, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtDni, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtApellido, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFechaNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(5, 5, 5)
-                        .addComponent(txtTelefono)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtCorreo))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtLicenses, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(comboLicense, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtLicenses, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -307,15 +376,54 @@ public class ClientFrm extends javax.swing.JFrame {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
+        delete();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
+        update();
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    private void txtFechaNacimientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFechaNacimientoActionPerformed
+    private void txtDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDateActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtFechaNacimientoActionPerformed
+    }//GEN-LAST:event_txtDateActionPerformed
+
+    private void comboLicenseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboLicenseActionPerformed
+     String selectedStr = (String) comboLicense.getSelectedItem();
+    if (selectedStr == null) return;
+    Licenses selected = Licenses.valueOf(selectedStr);
+
+    // txtLicenses sería tu JTextField para el número de licencia
+    switch(selected) {
+        case NONE:
+            txtLicenses.setVisible(false);
+            txtLicenses.setText("");
+            break;
+        case B1:
+        case B2:
+            txtLicenses.setVisible(true);
+            break;
+    }
+    }//GEN-LAST:event_comboLicenseActionPerformed
+
+    private void txtTelefonoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTelefonoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtTelefonoActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        save();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        clear();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        search();
+    }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -341,8 +449,9 @@ public class ClientFrm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new ClientFrm().setVisible(true));
     }
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> comboLicense;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -351,28 +460,178 @@ public class ClientFrm extends javax.swing.JFrame {
     private javax.swing.JDesktopPane jDesktopPane2;
     private javax.swing.JInternalFrame jInternalFrame1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanelBtns;
     private javax.swing.JPanel jPanelTitle;
-    private javax.swing.JTextField txtApellido;
-    private javax.swing.JFormattedTextField txtCedula;
     private javax.swing.JTextField txtCorreo;
-    private javax.swing.JFormattedTextField txtFechaNacimiento;
+    private javax.swing.JFormattedTextField txtDate;
+    private javax.swing.JFormattedTextField txtDni;
     private javax.swing.JTextField txtLicenses;
-    private javax.swing.JTextField txtNombre;
+    private javax.swing.JTextField txtName;
     private javax.swing.JFormattedTextField txtTelefono;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void clear() {
+    txtDni.setText("");
+    txtName.setText("");
+    txtDate.setText("");
+    txtTelefono.setText("");
+    txtCorreo.setText("");
+    txtLicenses.setText("");
+    comboLicense.setSelectedIndex(-1);
+    }
+
+    @Override
+    public boolean validateRequiere() {
+    return UtilGui.validateRequiere(txtDni,txtName,txtDate,txtTelefono,txtCorreo,txtLicenses,comboLicense);
+    }
+
+    @Override
+    public void save() {
+        try {
+            if (!validateRequiere()){
+                UtilGui.showErrorMessage(this, "Faltan datos requeridos", "Error");
+                return;
+            }
+            
+            String phone = txtTelefono.getText();
+            String license = txtLicenses.getText();
+            String id=txtDni.getText();
+            String name=txtName.getText();
+            String email=txtCorreo.getText();
+            LocalDate date=UtilDate.toLocalDate(txtDate.getText());
+//            Licenses licenseType=(Licenses)comboLicense.getSelectedItem();            
+            String selectedStr = (String) comboLicense.getSelectedItem();
+            Licenses licenseType = Licenses.valueOf(selectedStr);
+            client=new Clients(licenseType,license,id,name,date,phone,email);
+//        Clients(Licenses typeLicenses, String license, String id, String name, LocalDate birthDate, String phone, String email)
+
+if (!list.add(client)){
+    JOptionPane.showMessageDialog(this, "No se agrego el registro");
+    return;
+}
+
+UtilGui.showMessage(this, "Registro agregado "+client.getName(), "Agregado");
+showClientLicense();
+        } catch (PersonException e) {
+         JOptionPane.showMessageDialog(null, 
+        "General form error: " + e.getMessage(), 
+        "Error", 
+        JOptionPane.ERROR_MESSAGE);
+        } catch (NoLicensesException e) {
+        JOptionPane.showMessageDialog(null, 
+        "No license error: " + e.getMessage(), 
+        "Error", 
+        JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    @Override
+    public void update() {
+        try {
+            try{
+            if(client==null){
+                UtilGui.showErrorMessage(this, "No record has been selected a record", "Error");
+            }
+            
+            
+            if (!validateRequiere()){
+                UtilGui.showErrorMessage(this, "Required data is missing", "Error");
+                return;
+            }
+            
+            
+
+            String phone = txtTelefono.getText();
+            String email = txtCorreo.getText();
+            String license = txtLicenses.getText();
+            
+            client.setLicense(license);
+            client.setPhone(phone);
+            client.setEmail(email);
+            UtilGui.showMessage(this, "Updated", "update");
+            }catch(NoLicensesException e){
+                JOptionPane.showMessageDialog(null, 
+        "No license error: " + e.getMessage(), 
+        "Error", 
+        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (PersonException e) {
+        JOptionPane.showMessageDialog(null, 
+        "Phone invalid error: " + e.getMessage(), 
+        "Error", 
+        JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    @Override
+    public void delete() {
+             try {
+        if (client.getId() == null) {
+            UtilGui.showErrorMessage(this, "No record selected", "Error");
+            return;
+        }
+
+        int option = JOptionPane.showConfirmDialog(
+            this,
+            "¿Are you sure you want to remove this record??",
+            "Confirm elimination",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (option != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        if (!list.removeById(client.getId())) {
+            JOptionPane.showMessageDialog(this, "Record not removed");
+            return;
+        }
+
+        client = null;
+        clear();
+
+    } catch (ActiveReservationException e) {
+        JOptionPane.showMessageDialog(
+            null,
+            "Inactive reservation error: " + e.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE
+        );
+    }
+   }
+
+    @Override
+    public void search() {
+    ClientCrud crud = new ClientCrud(this,true); 
+    crud.setList(list);
+   crud.setVisible(true);
+    client=crud.getClients();
+   
+   if(client==null){
+       clear();
+   }else{
+       showData();
+   }
+    }
+
+    @Override
+    public void showData() {
+    comboLicense.setSelectedItem(client.getTypeLicenses());
+    txtName.setText(client.getName());
+    txtDni.setText(client.getId());
+    txtCorreo.setText(client.getEmail());
+    txtLicenses.setText(client.getLicense());
+    txtTelefono.setText(client.getPhone());
+    txtDate.setText(UtilDate.toString(client.getBirthDate()));
+    
+    }
 }
