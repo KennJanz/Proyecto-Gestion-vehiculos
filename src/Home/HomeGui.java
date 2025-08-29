@@ -4,6 +4,8 @@
  */
 package Home;
 
+import Cars.CarFrm;
+import CustomerClients.ClientFrm;
 import java.awt.Image;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -99,6 +101,11 @@ public class HomeGui extends javax.swing.JFrame {
         btnClient.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/clientIcon.png"))); // NOI18N
         btnClient.setText("jButton1");
         btnClient.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnClient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClientActionPerformed(evt);
+            }
+        });
 
         btnEmployee.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/employeeIcon.png"))); // NOI18N
         btnEmployee.setText("jButton1");
@@ -130,6 +137,11 @@ public class HomeGui extends javax.swing.JFrame {
         btnCar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/carIcon.png"))); // NOI18N
         btnCar.setText("jButton1");
         btnCar.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnCar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -185,6 +197,18 @@ public class HomeGui extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnCarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCarActionPerformed
+        // TODO add your handling code here:
+       CarFrm car = new CarFrm();
+       car.setVisible(true);
+    }//GEN-LAST:event_btnCarActionPerformed
+
+    private void btnClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientActionPerformed
+        // TODO add your handling code here:
+        ClientFrm client = new ClientFrm();
+        client.setVisible(true);
+    }//GEN-LAST:event_btnClientActionPerformed
 
     /**
      * @param args the command line arguments
