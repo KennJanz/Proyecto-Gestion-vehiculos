@@ -12,6 +12,8 @@ import CustomerClients.Clients;
 import Interfaces.FrmInterface;
 import Utils.UtilDate;
 import Utils.UtilGui;
+import exceptions.Bookings.BookingAlreadyStartedException;
+import exceptions.Bookings.BookingNotFoundException;
 import exceptions.Bookings.CarNotAvailableException;
 import exceptions.Cars.CarRentedException;
 import exceptions.Cars.DuplicateLicensePlateException;
@@ -37,15 +39,28 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
     
     /**
      * Creates new form CarFrm
+     * @param clientList
+     * @param carList
+     * @param bookingList
      */
-    public BookingFrm() {
+    public BookingFrm(ClientArraylist clientList, CarHashMap carList, BookingQueue bookingList) {
         initComponents();
+//     if(clientList == null || carList == null || list == null) {
+//        throw new IllegalArgumentException("Las listas no pueden estar vacias");
+//    }    
         
-        list = new BookingQueue();
-        booking = null;
         
-        showBookingStates();
-        
+    this.clientList = clientList;
+    this.carList = carList;
+    this.list = bookingList;  
+
+    booking = null;
+
+    
+    //loadClients();
+    //loadCars();
+    showBookingStates();
+    loadClientsAndCars();
     }
     
 
@@ -56,6 +71,58 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
         }
         txtBookingState.setModel(model);
     }
+    
+    private void loadClientsAndCars() {
+    DefaultComboBoxModel<Clients> clientModel = new DefaultComboBoxModel<>();
+    for (Clients c : clientList.getList()) {
+        clientModel.addElement(c);
+    }
+    txtClient.setModel((DefaultComboBoxModel) clientModel); // cast necesario
+
+    DefaultComboBoxModel<Car> carModel = new DefaultComboBoxModel<>();
+    for (Car car : carList.getAll()) {
+        carModel.addElement(car);
+    }
+    txtCar.setModel((DefaultComboBoxModel) carModel); // cast necesario
+}
+
+    
+    private void loadClients() {
+    txtClient.removeAllItems();
+    for (Clients c : clientList.getList()) {
+        txtClient.addItem(c.getName());
+    }
+}
+
+private void loadCars() {
+    txtCar.removeAllItems();
+    for (Car car : carList.getAll()) {
+        txtCar.addItem(car.getBrand() + " " + car.getModel());
+    }
+}
+
+    public void refresh() {
+    loadClients();
+    loadCars();
+}
+
+    
+    private void showClients() {
+    txtClient.removeAllItems();
+    for (Clients c : clientList.getList()) {
+        txtClient.addItem(c.getName());
+    }
+}
+
+private void showCars() {
+    txtCar.removeAllItems();
+    for (Car car : carList.getAll()) {
+        txtCar.addItem(car.getBrand() + " " + car.getModel());
+    }
+}
+
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -85,13 +152,14 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
         jBookingState = new javax.swing.JLabel();
         jEndDate = new javax.swing.JLabel();
         txtIdBooking = new javax.swing.JFormattedTextField();
-        txtClient = new javax.swing.JTextField();
-        txtCar = new javax.swing.JTextField();
         txtEndDate = new javax.swing.JFormattedTextField();
         txtStartDate = new javax.swing.JFormattedTextField();
         txtBookingState = new javax.swing.JComboBox<>();
+        txtCar = new javax.swing.JComboBox<>();
+        txtClient = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(520, 400));
 
         jInternalFrame1.setVisible(true);
 
@@ -185,7 +253,7 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
             .addGroup(jPanelBtnsLayout.createSequentialGroup()
                 .addGroup(jPanelBtnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnClear, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE)
+                    .addComponent(btnClear, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE)
                     .addComponent(btnUpdate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnRemove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -231,12 +299,6 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
             ex.printStackTrace();
         }
 
-        txtClient.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtClientActionPerformed(evt);
-            }
-        });
-
         try {
             txtEndDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("####")));
         } catch (java.text.ParseException ex) {
@@ -250,6 +312,10 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
         });
 
         txtBookingState.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        txtCar.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        txtClient.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout jPanelBodyLayout = new javax.swing.GroupLayout(jPanelBody);
         jPanelBody.setLayout(jPanelBodyLayout);
@@ -266,14 +332,13 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
                     .addComponent(jStartDate)
                     .addComponent(jBookingState))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanelBodyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelBodyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(txtIdBooking, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
-                        .addComponent(txtClient)
-                        .addComponent(txtCar)
-                        .addComponent(txtEndDate))
-                    .addComponent(txtStartDate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtBookingState, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanelBodyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtIdBooking, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
+                    .addComponent(txtEndDate)
+                    .addComponent(txtStartDate, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
+                    .addComponent(txtBookingState, 0, 137, Short.MAX_VALUE)
+                    .addComponent(txtClient, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtCar, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(54, 54, 54))
         );
         jPanelBodyLayout.setVerticalGroup(
@@ -300,10 +365,10 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
                     .addComponent(jStartDate)
                     .addComponent(txtStartDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanelBodyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanelBodyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBookingState)
                     .addComponent(txtBookingState, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(60, 60, 60))
+                .addGap(64, 64, 64))
         );
 
         javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
@@ -323,8 +388,8 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
             .addGroup(jInternalFrame1Layout.createSequentialGroup()
                 .addComponent(jPanelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelBody, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanelBody, javax.swing.GroupLayout.PREFERRED_SIZE, 223, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanelBtns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -342,9 +407,10 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
         );
         jDesktopPane2Layout.setVerticalGroup(
             jDesktopPane2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDesktopPane2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDesktopPane2Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -359,7 +425,7 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jDesktopPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 103, Short.MAX_VALUE))
+                .addGap(0, 81, Short.MAX_VALUE))
         );
 
         pack();
@@ -398,10 +464,6 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void txtClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtClientActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtClientActionPerformed
-
     /**
      * @param args the command line arguments
      */
@@ -411,20 +473,23 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+      try {
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
+    } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+        logger.log(java.util.logging.Level.SEVERE, null, ex);
+    }
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new BookingFrm().setVisible(true));
+    java.awt.EventQueue.invokeLater(() -> {
+        ClientArraylist clientList = new ClientArraylist(); // 👈 instancia real
+        CarHashMap carList = new CarHashMap();              // 👈 instancia real
+        BookingQueue bookingQueue = new BookingQueue();
+        new BookingFrm(clientList, carList,bookingQueue).setVisible(true);
+    });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -447,8 +512,8 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
     private javax.swing.JPanel jPanelTitle;
     private javax.swing.JLabel jStartDate;
     private javax.swing.JComboBox<String> txtBookingState;
-    private javax.swing.JTextField txtCar;
-    private javax.swing.JTextField txtClient;
+    private javax.swing.JComboBox<String> txtCar;
+    private javax.swing.JComboBox<String> txtClient;
     private javax.swing.JFormattedTextField txtEndDate;
     private javax.swing.JFormattedTextField txtIdBooking;
     private javax.swing.JFormattedTextField txtStartDate;
@@ -459,8 +524,8 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
     @Override
     public void clear() {
     txtIdBooking.setText("");
-    txtClient.setText("");
-    txtCar.setText("");
+    txtClient.setSelectedIndex(-1); 
+    txtCar.setSelectedIndex(-1);  
     txtStartDate.setText("");
     txtEndDate.setText("");
     txtBookingState.setSelectedIndex(-1);
@@ -471,48 +536,50 @@ public class BookingFrm extends javax.swing.JFrame implements FrmInterface {
     return UtilGui.validateRequiere(txtIdBooking,txtClient,txtCar,txtEndDate,txtBookingState);
     }
 
-    @Override
-    public void save() {
-        try {
-            String idBooking = txtIdBooking.getText();
-            String clientId = txtClient.getText();
-            String carPlate = txtCar.getText();
-            
-// Buscar cliente en la lista
-Clients client = clientList.find(clientId);
-if (client == null) {
-    JOptionPane.showMessageDialog(this, "Client not found: " + clientId);
-    return;
-}
+   @Override
+public void save() {
+    try {
+        String idBooking = txtIdBooking.getText();
 
-// Buscar carro en la lista
-Car car = carList.find(carPlate);
-if (car == null) {
-    JOptionPane.showMessageDialog(this, "Car not found: " + carPlate);
-    return;
-}
+        // Recuperar directamente los objetos seleccionados
+        Clients selectedClient = (Clients) txtClient.getSelectedItem();
+        Car selectedCar = (Car) txtCar.getSelectedItem();
 
-LocalDate startDate = UtilDate.toLocalDate(txtStartDate.getText());
-LocalDate endDate = UtilDate.toLocalDate(txtEndDate.getText());
-BookingState bookingState = (BookingState) txtBookingState.getSelectedItem();
-
-// Crear la reserva
-booking = new Booking(idBooking, client, car, startDate, endDate, bookingState);
-
-if (!list.correctAdd(booking)) {
-    JOptionPane.showMessageDialog(this, "The record was not added");
-    return;
-}
-
-UtilGui.showMessage(this, "Register added " + car.getLicensePlate(), "Agregado");
-showBookingStates();
-        } catch (CarNotAvailableException ex) {
-            System.getLogger(BookingFrm.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        // Validaciones
+        if (selectedClient == null) {
+            JOptionPane.showMessageDialog(this, "Client not found");
+            return;
         }
-    }
 
-    @Override
-    public void update() {
+        if (selectedCar == null) {
+            JOptionPane.showMessageDialog(this, "Car not found");
+            return;
+        }
+
+        LocalDate startDate = UtilDate.toLocalDate(txtStartDate.getText());
+        LocalDate endDate = UtilDate.toLocalDate(txtEndDate.getText());
+        BookingState bookingState = (BookingState) txtBookingState.getSelectedItem();
+
+        // Crear la reserva
+        booking = new Booking(idBooking, selectedClient, selectedCar, startDate, endDate, bookingState);
+
+        if (!list.correctAdd(booking)) {
+            JOptionPane.showMessageDialog(this, "The record was not added");
+            return;
+        }
+
+        UtilGui.showMessage(this, "Register added " + selectedCar.getLicensePlate(), "Agregado");
+        showBookingStates();
+
+    } catch (CarNotAvailableException ex) {
+        System.getLogger(BookingFrm.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+    }
+}
+
+
+
+   @Override
+public void update() {
     if (booking == null) {
         UtilGui.showErrorMessage(this, "No record has been selected", "Error");
         return;
@@ -529,7 +596,8 @@ showBookingStates();
         booking.setBookingState(bookingState);
 
         // Nuevo vehículo
-        String carPlate = txtCar.getText();
+        String carPlate = (String) txtCar.getSelectedItem();
+
         Car newCar = carList.find(carPlate);
 
         if (newCar == null) {
@@ -542,26 +610,37 @@ showBookingStates();
             return;
         }
 
-       
+        // Liberar carro anterior
+        Car oldCar = booking.getCar();
+        if (oldCar != null) {
+            oldCar.setCarState(CarState.AVAILABLE);
+        }
+
+        // Asignar nuevo carro y marcarlo como RENTED
+        newCar.setCarState(CarState.RENTED);
         booking.setCar(newCar);
 
         UtilGui.showMessage(this, "Booking updated successfully", "Update");
 
     } catch (Exception e) {
-        UtilGui.showErrorMessage(this, "Error updating booking: " + e.getMessage(), "Error");
+         JOptionPane.showMessageDialog(null, 
+        "Generic Error: " + e.getMessage(), 
+        "Error", 
+        JOptionPane.ERROR_MESSAGE);
     }
 }
+
     @Override
     public void delete() {
-         try {
-        if (car == null) {
+          try {
+        if (booking == null) {
             UtilGui.showErrorMessage(this, "No record selected", "Error");
             return;
         }
 
         int option = JOptionPane.showConfirmDialog(
             this,
-            "¿Are you sure you want to remove this record??",
+            "Are you sure you want to remove this record?",
             "Confirm elimination",
             JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE
@@ -571,46 +650,62 @@ showBookingStates();
             return;
         }
 
-        if (!list.correctRemove(car)) {
+        if (!list.correctRemove(booking)) {
             JOptionPane.showMessageDialog(this, "Record not removed");
             return;
         }
 
-        car = null;
+        
+        Car car = booking.getCar();
+        if (car != null) {
+            car.setCarState(CarState.AVAILABLE);
+        }
+
+        booking = null;
         clear();
 
-    } catch (CarRentedException e) {
-        JOptionPane.showMessageDialog(
-            null,
-            "State error: " + e.getMessage(),
-            "Error",
-            JOptionPane.ERROR_MESSAGE
-        );
+    }   catch (BookingNotFoundException e) {
+         JOptionPane.showMessageDialog(null, 
+        "No booking found: " + e.getMessage(), 
+        "Error", 
+        JOptionPane.ERROR_MESSAGE);
+    } catch (BookingAlreadyStartedException e) {
+         JOptionPane.showMessageDialog(null, 
+        "Booking Already Started Error: " + e.getMessage(), 
+        "Error", 
+        JOptionPane.ERROR_MESSAGE);
     }
     }
 
     @Override
     public void search() {
-        CarCrud crud = new CarCrud(this,true); 
+        BookingCrud crud = new BookingCrud(this,true); 
     crud.setList(list);
    crud.setVisible(true);
-   car=crud.getCar();
+   booking=crud.getBooking();
    
-   if(car==null){
+   if(booking==null){
        clear();
    }else{
        showData();
    }
     }
 
-    @Override
-    public void showData() {
-    txtBookingState.setSelectedItem(car.getCarState());
-    txtCar.setText(car.getModel());
-    txtClient.setText(car.getBrand());
-    txtIdBooking.setText(car.getLicensePlate());
-    txtEndDate.setText(String.valueOf(car.getYear().getValue()));
+   @Override
+public void showData() {
+    if (booking == null) {
+        clear();
+        return;
     }
+
+    txtIdBooking.setText(booking.getIdBooking());
+    txtClient.setSelectedItem(booking.getClient());
+    txtCar.setSelectedItem(booking.getCar());
+    txtStartDate.setText(booking.getStartDate().toString());
+    txtEndDate.setText(booking.getEndDate().toString());
+    txtBookingState.setSelectedItem(booking.getBookingState());
+}
+
 
    
 }
