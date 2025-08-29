@@ -26,15 +26,16 @@ public class CarFrm extends javax.swing.JFrame implements FrmInterface {
     
     /**
      * Creates new form CarFrm
+     * 
      */
-    public CarFrm() {
+    public CarFrm(CarHashMap list) {
         initComponents();
-        
-        list = new CarHashMap();
-        car = null;
-        
-        showCarStates();
-        showCarType();
+     
+    this.list = (list != null) ? list : new CarHashMap();
+    car = null;
+    
+    showCarStates();
+    showCarType();
     }
     
     private void showCarType() {
@@ -392,9 +393,9 @@ public class CarFrm extends javax.swing.JFrame implements FrmInterface {
             logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+       CarHashMap carList = new CarHashMap();
+        java.awt.EventQueue.invokeLater(() -> new CarFrm(carList).setVisible(true));
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new CarFrm().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

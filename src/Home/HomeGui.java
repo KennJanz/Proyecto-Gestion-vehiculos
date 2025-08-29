@@ -4,12 +4,19 @@
  */
 package Home;
 
+import Bookings.Booking;
+import Bookings.BookingFrm;
+import Bookings.BookingQueue;
 import Cars.CarFrm;
+import Cars.CarHashMap;
+import CustomerClients.ClientArraylist;
 import CustomerClients.ClientFrm;
+import employee.EmployeeFrm;
 import java.awt.Image;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -17,12 +24,24 @@ import javax.swing.JButton;
  */
 public class HomeGui extends javax.swing.JFrame {
     
+    
+    private BookingQueue bookingList;
+    private Booking booking;
+    private ClientArraylist clientList;
+    private CarHashMap carList; 
+    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(HomeGui.class.getName());
 
     /**
      * Creates new form HomeGui
      */
     public HomeGui() {
+        
+         clientList = new ClientArraylist();
+    carList = new CarHashMap();
+    bookingList = new BookingQueue();
+        
+        
         initComponents();
         btnBook.setIcon(setIcons("/icons/BookIcon.png",btnBook));
         btnRent.setIcon(setIcons("/icons/carRenICON.png",btnRent));
@@ -68,6 +87,11 @@ public class HomeGui extends javax.swing.JFrame {
 
         btnBook.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/BookIcon.png"))); // NOI18N
         btnBook.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBookActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -110,6 +134,11 @@ public class HomeGui extends javax.swing.JFrame {
         btnEmployee.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/employeeIcon.png"))); // NOI18N
         btnEmployee.setText("jButton1");
         btnEmployee.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnEmployee.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEmployeeActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -200,15 +229,36 @@ public class HomeGui extends javax.swing.JFrame {
 
     private void btnCarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCarActionPerformed
         // TODO add your handling code here:
-       CarFrm car = new CarFrm();
+       CarFrm car = new CarFrm(carList);
        car.setVisible(true);
     }//GEN-LAST:event_btnCarActionPerformed
 
     private void btnClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientActionPerformed
         // TODO add your handling code here:
-        ClientFrm client = new ClientFrm();
-        client.setVisible(true);
+        ClientFrm clientFrm = new ClientFrm(clientList);
+        clientFrm.setVisible(true);
+
     }//GEN-LAST:event_btnClientActionPerformed
+
+    private void btnBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBookActionPerformed
+        // TODO add your handling code here:
+        try{
+       BookingFrm bookingFrm = new BookingFrm(clientList, carList, bookingList);
+    bookingFrm.refresh();
+    bookingFrm.setVisible(true);
+        }catch(IllegalArgumentException e){
+        JOptionPane.showMessageDialog(null, 
+        "Null element: " + e.getMessage(), 
+        "Error", 
+        JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnBookActionPerformed
+
+    private void btnEmployeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEmployeeActionPerformed
+        // TODO add your handling code here:
+        EmployeeFrm employeeFrm = new EmployeeFrm();
+        employeeFrm.setVisible(true);
+    }//GEN-LAST:event_btnEmployeeActionPerformed
 
     /**
      * @param args the command line arguments

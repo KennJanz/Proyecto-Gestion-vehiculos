@@ -8,6 +8,7 @@ package Cars;
 import employee.Employee;
 import exceptions.Cars.CarRentedException;
 import exceptions.Cars.DuplicateLicensePlateException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -92,6 +93,11 @@ public class CarHashMap implements Lists.List<Car>{
     public boolean remove(Car l) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+    
+    public Collection<Car> getAll() {
+    return map.values();
+}
+
 
     
 } 

@@ -92,8 +92,9 @@ public class Car {
 
     @Override
     public String toString() {
-        return "Car{" + "licensePlate=" + licensePlate + ", brand=" + brand + ", model=" + model + ", year=" + year + ", carType=" + carType + ", carState=" + carState + '}';
+        return brand + " " + model + " (" + licensePlate + ")";
     }
+
     
     
     

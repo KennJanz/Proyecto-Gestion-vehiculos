@@ -88,6 +88,11 @@ public class BookingQueue implements List<Booking>{
     public boolean remove(Booking l) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+    
+    public java.util.List<Booking> getAll() {
+    return new LinkedList<>(queue); 
+}
+
   
     
 }
