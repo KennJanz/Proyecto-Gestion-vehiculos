@@ -70,6 +70,11 @@ public class Clients extends Person {
         this.license = license;
         this.reservations = new ArrayList<>();
     }
+
+    @Override
+    public String toString() {
+        return "Clients{" + "typeLicenses=" + typeLicenses + ", license=" + license + ", reservations=" + reservations + '}';
+    }
     
     
 }
