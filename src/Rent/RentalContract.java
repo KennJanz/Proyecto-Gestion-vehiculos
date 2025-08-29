@@ -20,7 +20,7 @@ public class RentalContract {
     private LocalDate startDate;
     private LocalDate endDate;
     private double amount;
-    private String status;
+    private RentState status;
 
     public String getContractId() {
         return contractId;
